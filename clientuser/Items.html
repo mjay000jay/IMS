@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Products - Bugasan ni Mayang</title>
+    <link rel="stylesheet" href="Items.css">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Bugasan ni<br>Mayang</h2>
+            <nav>
+                <p class = "extension">MAIN</p>
+                <ul>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li class="active">Products</li>
+                    <li><a href="Orders.html">Orders</a></li>
+                </ul>
+            </nav>
+            <div class="settings">
+                <p class = "extension">SETTINGS</p>
+                <ul>
+                    <li><a href="">Settings</a></li>
+                    <li><a href="">Logout</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <h1>Products</h1>
+                <div class="user-profile">
+                    <div class="avatar">C</div>
+                    <span>Customer User</span>
+                </div>
+            </header>
+            <div class="header">
+                <p>Note: Always double check when placing an order!</p>
+            </div>
+            <section class="products-management">
+
+                <div class="search-filter">
+                    <input type="text" placeholder="Search products...">
+                    <select>
+                        <option>All Categories</option>
+                    </select>
+                    <select>
+                        <option>All Status</option>
+                    </select>
+                </div>
+
+                <div class="products-table-container"> <table id="products-table">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Product Name</th>
+                            <th>Type</th>
+                            <th>Sizes</th>
+                            <th>Price Range</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Sinandomeng</td>
+                            <td>White Rice</td>
+                            <td>1kg, 5kg, 10kg</td>
+                            <td>₱50.00- ₱1300.00</td>
+                            <td class="in-stock">In Stock</td>
+                            <td><button class="order-btn">Order</button></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Jasmine Rice</td>
+                            <td>Specialty Rice</td>
+                            <td>1kg, 5kg, 10kg</td>
+                            <td>₱55.00- ₱2,100.00</td>
+                            <td class="low-stock">Low Stock</td>
+                            <td><button class="order-btn">Order</button></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Brown Rice</td>
+                            <td>Brown Rice</td>
+                            <td>1kg, 5kg</td>
+                            <td>₱60.00- ₱300.00</td>
+                            <td class="out-of-stock">Out of Stock</td>
+                            <td><button class="order-btn out-of-stock">Order</button></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Ganador</td>
+                            <td>White Rice</td>
+                            <td>1kg, 5kg, ,10kg, 1sack</td>
+                            <td>₱58.00 - ₱3,200.00</td>
+                            <td class="in-stock">In Stock</td>
+                            <td><button class="order-btn">Order</button></td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Lion Ivory</td>
+                            <td>Specialty Rice</td>
+                            <td>1kg, 5kg, 10kg, 1sack</td>
+                            <td>₱59.00 - ₱3,100.00</td>
+                            <td class="in-stock">In Stock</td>
+                            <td><button class="order-btn">Order</button></td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>Conchita</td>
+                            <td>White Rice</td>
+                            <td>1kg, 5kg</td>
+                            <td>₱60.00 - ₱300.00</td>
+                            <td class="low-stock">Low Stock</td>
+                            <td><button class="order-btn">Order</button></td>
+                        </tr>
+                         <tr>
+                            <td>7</td>
+                            <td>Pilit</td>
+                            <td>Sticky Rice</td>
+                            <td>1kg, 5kg</td>
+                            <td>₱50.00 - ₱250.00</td>
+                            <td class="out-of-stock">Out of Stock</td>
+                            <td><button class="order-btn out-of-stock">Order</button></td>
+                        </tr>
+                    </tbody>
+                </div> </table>
+
+            </section>
+        </main>
+    </div>
+
+    <div id="order-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Place Order</h2>
+                <span class="close-button">&times;</span>
+            </div>
+            <div class="modal-body">
+                <label for="order-size">Size:</label>
+                <select id="order-size" name="order-size">
+                    <option value="1kg">1kg</option>
+                    <option value="5kg">5kg</option>
+                    <option value="10kg">10kg</option>
+                    </select>
+                <label for="order-quantity">Quantity:</label>
+                <input type="number" id="order-quantity" name="order-quantity" value="1" min="1">
+                <label for="order-notes">Additional Instructions:</label>
+                <input type="text" id="order-notes" name="order-notes">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="cancel-button">Cancel</button>
+                <button type="button" class="order-button">Place Order</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const productsTableBody = document.querySelector('#products-table tbody');
+            const searchInput = document.querySelector('.search-filter input[type="text"]');
+            const categorySelect = document.querySelector('.search-filter select:nth-child(2)');
+            const statusSelect = document.querySelector('.search-filter select:nth-child(3)');
+            const orderModal = document.getElementById('order-modal');
+            const orderButtons = document.querySelectorAll('.order-btn');
+            const closeButton = document.querySelector('.close-button');
+            const cancelButton = document.querySelector('.cancel-button');
+            const placeOrderButton = document.querySelector('.order-button');
+
+            let productsData = [];
+            let selectedProduct = null;
+
+            // Function to fetch product data (replace with your actual data source)
+            const fetchProducts = () => {
+                productsData = Array.from(productsTableBody.rows).map(row => {
+                    const cells = Array.from(row.cells);
+                    return {
+                        id: cells[0].textContent,
+                        name: cells[1].textContent,
+                        category: cells[2].textContent,
+                        sizes: cells[3].textContent,
+                        priceRange: cells[4].textContent,
+                        status: cells[5].textContent,
+                        rowElement: row
+                    };
+                });
+            };
+
+            const filterProducts = () => {
+                const searchTerm = searchInput.value.toLowerCase();
+                const selectedCategory = categorySelect.value;
+                const selectedStatus = statusSelect.value;
+
+                productsTableBody.innerHTML = '';
+
+                const filteredProducts = productsData.filter(product => {
+                    const nameMatch = product.name.toLowerCase().includes(searchTerm);
+                    const categoryMatch = selectedCategory === 'All Categories' || product.category === selectedCategory;
+                    const statusMatch = selectedStatus === 'All Status' || product.status === selectedStatus;
+
+                    return nameMatch && categoryMatch && statusMatch;
+                });
+
+                filteredProducts.forEach(product => {
+                    productsTableBody.appendChild(product.rowElement);
+                });
+
+                // Re-number the IDs in the displayed table after filtering
+                Array.from(productsTableBody.rows).forEach((row, index) => {
+                    row.cells[0].textContent = index + 1;
+                });
+            };
+
+            fetchProducts();
+
+            searchInput.addEventListener('input', filterProducts);
+            categorySelect.addEventListener('change', filterProducts);
+            statusSelect.addEventListener('change', filterProducts);
+
+           orderButtons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const row = event.target.closest('tr');
+                    const productName = row.cells[1].textContent;
+                    selectedProduct = productsData.find(p => p.name === productName);
+                    if (selectedProduct) {
+                       if (selectedProduct.status === 'Out of Stock'){
+                           return;
+                       }
+                        // Populate the size dropdown with the sizes available for the selected product.
+                        const sizeSelect = document.getElementById('order-size');
+                        sizeSelect.innerHTML = ''; // Clear previous options
+                        const sizes = selectedProduct.sizes.split(',').map(s => s.trim()); // Split and trim
+                        sizes.forEach(size => {
+                            const option = document.createElement('option');
+                            option.value = size;
+                            option.textContent = size;
+                            sizeSelect.appendChild(option);
+                        });
+                        orderModal.style.display = "block";
+                    }
+                });
+            });
+
+            closeButton.addEventListener('click', () => {
+                orderModal.style.display = "none";
+            });
+
+            cancelButton.addEventListener('click', () => {
+                orderModal.style.display = "none";
+            });
+
+            window.addEventListener('click', (event) => {
+                if (event.target === orderModal) {
+                    orderModal.style.display = "none";
+                }
+            });
+
+            placeOrderButton.addEventListener('click', () => {
+                if (selectedProduct) {
+                    const orderSize = document.getElementById('order-size').value;
+                    const orderQuantity = document.getElementById('order-quantity').value;
+                    const orderNotes = document.getElementById('order-notes').value;
+                    alert(`Order placed for ${orderQuantity} of ${selectedProduct.name} - ${orderSize}. Notes: ${orderNotes}`);
+                    orderModal.style.display = "none";
+                    // Here, you would send the order details to your server.
+                } else {
+                    alert("No product selected to order."); //Should not happen, unless button clicked without product.
+                }
+            });
+
+            // Populate category and status dropdowns on initial load
+            const populateDropdowns = () => {
+                const categories = ['All Categories', ...Array.from(new Set(productsData.map(p => p.category)))];
+                categorySelect.innerHTML = '';
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category;
+                    categorySelect.appendChild(option);
+                });
+
+                const statuses = ['All Status', ...Array.from(new Set(productsData.map(p => p.status)))];
+                statusSelect.innerHTML = '';
+                statuses.forEach(status => {
+                    const option = document.createElement('option');
+                    option.value = status;
+                    option.textContent = status;
+                    statusSelect.appendChild(option);
+                });
+            };
+
+            populateDropdowns();
+            filterProducts(); // Initial filtering to apply "All" selections
+        });
+    </script>
+</body>
+</html>

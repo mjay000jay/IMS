@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Orders - Bugas ni Mayang</title>
+    <link rel="stylesheet" href="Orders.css">
+</head>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Bugasan ni<br>Mayang</h2>
+            <nav>
+                <p class="extension">MAIN</p>
+                <ul>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="Items.html">Products</a></li>
+                    <li class="active">Orders</li>
+                </ul>
+            </nav>
+            <div class="settings">
+                <p class="extension">SETTINGS</p>
+                <ul>
+                    <li><a href="#">Settings</a></li>
+                    <li><a href="#">Logout</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <h1>Orders</h1>
+                <div class="user-profile">
+                    <div class="avatar">C</div>
+                    <span>Customer User</span>
+                </div>
+            </header>
+
+            <section class="order-summary-boxes">
+                <div class="order-box pending" onclick="showOrderList('pending')">
+                    <h3>Pending Orders</h3>
+                    <p id="pending-count">0</p>
+                </div>
+                <div class="order-box out-for-delivery" onclick="showOrderList('out-for-delivery')">
+                    <h3>Out for Delivery</h3>
+                    <p id="out-for-delivery-count">0</p>
+                </div>
+                <div class="order-box completed" onclick="showOrderList('completed')">
+                    <h3>Completed Orders</h3>
+                    <p id="completed-count">0</p>
+                </div>
+                <div class="order-box cancelled-returned" onclick="showOrderList('cancelled-returned')">
+                    <h3>Cancelled/Returned</h3>
+                    <p id="cancelled-returned-count">0</p>
+                </div>
+            </section>
+
+            <section class="order-lists-container">
+                <div id="pending-orders-list" class="order-list">
+                    <h2>Pending Orders</h2>
+                    <table class="pending-orders-table">
+                        <thead>
+                            <tr>
+                                <th>Order No.</th>
+                                <th>Product Name</th>
+                                <th>Size</th>
+                                <th>Price</th>
+                                <th>MOP</th>
+                                <th>Shipping Address</th>
+                                <th>Confirmation</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pending-orders-table-body">
+                        </tbody>
+                    </table>
+                    <p id="pending-orders-empty" style="display:none;">No pending orders at the moment.</p>
+                </div>
+                <div id="out-for-delivery-orders-list" class="order-list" style="display: none;">
+                    <h2>Out for Delivery Orders</h2>
+                    <table class="out-for-delivery-orders-table">
+                        <thead>
+                            <tr>
+                                <th>Order No.</th>
+                                <th>Product Name</th>
+                                <th>Size</th>
+                                <th>Price</th>
+                                <th>MOP</th>
+                                <th>Date Ordered</th>
+                                <th>Est. Time of Arrival</th>
+                                <th>Confirmation</th>
+                            </tr> 
+                        </thead>
+                        <tbody id="out-for-delivery-orders-table-body">
+                        </tbody>
+                    </table>
+                    <p>No orders out for delivery at the moment.</p>
+                </div>
+
+                <div id="completed-orders-list" class="order-list">
+                    <h2>Completed Orders</h2>
+                    <table class="completed-orders-table">
+                      <thead>
+                        <tr>
+                          <th>Order No.</th>
+                          <th>Product Name</th>
+                          <th>Size</th>
+                          <th>Price</th>
+                          <th>MOP</th>
+                          <th>Date Ordered</th>
+                          <th>Date Delivered</th>
+                        </tr>
+                      </thead>
+                      <tbody id="completed-orders-table-body">
+                        </tbody>
+                    </table>
+                    <p>No completed orders at the moment.</p>
+                </div>
+
+                <div id="cancelled-returned-orders-list" class="order-list">
+                    <h2>Cancelled/Returned Orders</h2>
+                    <table class="cancelled-returned-orders-table">
+                      <thead>
+                        <tr>
+                          <th>Order No.</th>
+                          <th>Product Name</th>
+                          <th>Size</th>
+                          <th>Price</th>
+                          <th>MOP</th>
+                          <th>Date Ordered</th>
+                          <th>Date Cancelled/Returned</th>
+                          <th>Reason</th>
+                          <th>Status</th> </tr>
+                      </thead>
+                      <tbody id="cancelled-returned-orders-table-body">
+                        </tbody>
+                    </table>
+                    <p>No cancelled/returned orders at the moment.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="customerDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h2>Edit Customer Details</h2>
+            <form id="customerDetailsForm">
+                <div class="modal-section-title">Customer Details</div>
+                <div class="form-row">
+                    <div>
+                        <label for="customer-lastname-edit">Last Name:</label>
+                        <input type="text" id="customer-lastname-edit" name="customer-lastname-edit">
+                    </div>
+                    <div>
+                        <label for="customer-firstname-edit">First Name:</label>
+                        <input type="text" id="customer-firstname-edit" name="customer-firstname-edit">
+                    </div>
+                    <div>
+                        <label for="customer-gender-edit">Gender:</label>
+                        <select id="customer-gender-edit" name="customer-gender-edit">
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label for="customer-contact-edit">Contact #:</label>
+                        <input type="text" id="customer-contact-edit" name="customer-contact-edit">
+                    </div>
+                    <div>
+                        <label for="customer-email-edit">Email Address (Optional):</label>
+                        <input type="email" id="customer-email-edit" name="customer-email-edit">
+                    </div>
+                </div>
+
+                <div class="modal-section-title">Shipping Address</div>
+                <div class="form-row">
+                    <div>
+                        <label for="shipping-city-edit">City:</label>
+                        <input type="text" id="shipping-city-edit" name="shipping-city-edit">
+                    </div>
+                    <div>
+                        <label for="shipping-province-edit">Province:</label>
+                        <input type="text" id="shipping-province-edit" name="shipping-province-edit">
+                    </div>
+                </div>
+                <div>
+                    <label for="shipping-street-edit">Street:</label>
+                    <input type="text" id="shipping-street-edit" name="shipping-street-edit">
+                </div>
+                <div>
+                    <label for="shipping-barangay-edit">Barangay:</label>
+                    <input type="text" id="shipping-barangay-edit" name="shipping-barangay-edit">
+                </div>
+                <div>
+                    <label for="shipping-postal-code-edit">Postal Code:</label>
+                    <input type="text" id="shipping-postal-code-edit" name="shipping-postal-code-edit">
+                </div>
+                <div>
+                    <label for="shipping-additional-message-edit">Additional Message:</label>
+                    <textarea id="shipping-additional-message-edit" name="shipping-additional-message-edit"></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="save" onclick="saveCustomerDetails()">Save Details</button>
+                    <button type="button" class="cancel" onclick="closeModal()">Cancel</button>
+                </div>
+                <input type="hidden" id="current-order-id">
+            </form>
+        </div>
+    </div>
+
+    <script>
+      let currentOrders = []; // To store the fetched order data
+        let activeOrderIdForDetails = null; // To track which order's details are being viewed
+
+        function showCustomerDetails(orderId) {
+            activeOrderIdForDetails = orderId;
+            const order = currentOrders.find(order => order.orderId === orderId);
+            if (order && order.customerDetails) {
+                document.getElementById('customer-lastname-edit').value = order.customerDetails.lastName || '';
+                document.getElementById('customer-firstname-edit').value = order.customerDetails.firstName || '';
+                document.getElementById('customer-gender-edit').value = order.customerDetails.gender || '';
+                document.getElementById('customer-contact-edit').value = order.customerDetails.contact || '';
+                document.getElementById('customer-email-edit').value = order.customerDetails.email || '';
+                document.getElementById('shipping-city-edit').value = order.customerDetails.shippingAddress.city || '';
+                document.getElementById('shipping-province-edit').value = order.customerDetails.shippingAddress.province || '';
+                document.getElementById('shipping-street-edit').value = order.customerDetails.shippingAddress.street || '';
+                document.getElementById('shipping-barangay-edit').value = order.customerDetails.shippingAddress.barangay || '';
+                document.getElementById('shipping-postal-code-edit').value = order.customerDetails.shippingAddress.postalCode || '';
+                document.getElementById('shipping-additional-message-edit').value = order.customerDetails.shippingAddress.additionalMessage || '';
+                document.getElementById('current-order-id').value = orderId;
+                document.getElementById('customerDetailsModal').style.display = "block";
+            }
+        }
+
+        function saveCustomerDetails() {
+            if (activeOrderIdForDetails) {
+                const order = currentOrders.find(order => order.orderId === activeOrderIdForDetails);
+                if (order && order.customerDetails) {
+                    order.customerDetails.lastName = document.getElementById('customer-lastname-edit').value;
+                    order.customerDetails.firstName = document.getElementById('customer-firstname-edit').value;
+                    order.customerDetails.gender = document.getElementById('customer-gender-edit').value;
+                    order.customerDetails.contact = document.getElementById('customer-contact-edit').value;
+                    order.customerDetails.email = document.getElementById('customer-email-edit').value;
+                    order.customerDetails.shippingAddress.city = document.getElementById('shipping-city-edit').value;
+                    order.customerDetails.shippingAddress.province = document.getElementById('shipping-province-edit').value;
+                    order.customerDetails.shippingAddress.street = document.getElementById('shipping-street-edit').value;
+                    order.customerDetails.shippingAddress.barangay = document.getElementById('shipping-barangay-edit').value;
+                    order.customerDetails.shippingAddress.postalCode = document.getElementById('shipping-postal-code-edit').value;
+                    order.customerDetails.shippingAddress.additionalMessage = document.getElementById('shipping-additional-message-edit').value;
+
+                    // In a real application, you would send this updated information
+                    // to your backend to persist the changes.
+                    alert(`Customer details for Order ${activeOrderIdForDetails} saved! (Backend update needed)`);
+                    closeModal();
+                }
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('customerDetailsModal').style.display = "none";
+            activeOrderIdForDetails = null; // Reset the active order ID
+        }
+
+        // Close modal if user clicks outside
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('customerDetailsModal')) {
+                closeModal();
+            }
+        }
+
+        function confirmOrder(orderId) {
+            const order = currentOrders.find(order => order.orderId === orderId);
+            if (order) {
+                const mopSelect = document.getElementById(`mop-${orderId}`);
+                const selectedMOP = mopSelect ? mopSelect.value : order.mop; // Get selected MOP or fallback
+
+                alert(`Order ${orderId} confirmed with MOP: ${selectedMOP}! (Implementation to update backend needed)`);
+                // In a real application, you would send an update to your backend
+                // to change the order status and the MOP, and potentially remove it
+                // from the pending list.
+            }
+        }
+
+        function cancelOrder(orderId) {
+            alert(`Order ${orderId} cancelled! (Implementation to update backend needed)`);
+            // In a real application, you would send an update to your backend
+            // to change the order status and potentially move it to the cancelled list.
+        }
+
+        function showOrderList(listId) {
+            // Hide all order lists
+            const orderLists = document.querySelectorAll('.order-list');
+            orderLists.forEach(list => list.style.display = 'none');
+
+            // Show the selected order list
+            const selectedList = document.getElementById(listId + '-orders-list');
+            if (selectedList) {
+                selectedList.style.display = 'block';
+            }
+        }
+
+        // In a real application, you would fetch your order data
+        // and update the counts and lists dynamically.
+        document.addEventListener('DOMContentLoaded', () => {
+            // Example data (replace with your actual data fetching)
+            currentOrders = [
+                {
+                    orderId: 1,
+                    productName: 'Sinandomeng',
+                    size: '5kg',
+                    price: '₱650.00',
+                    mop: 'Cash on Delivery',
+                    customerDetails: {
+                        lastName: 'Santos',
+                        firstName: 'Maria',
+                        gender: 'female',
+                        contact: '09123456789',
+                        email: 'maria.santos@example.com',
+                        shippingAddress: {
+                            city: 'Cebu City',
+                            province: 'Cebu',
+                            street: '123 Main St',
+                            barangay: 'Lahug',
+                            postalCode: '6000',
+                            additionalMessage: 'Landmark near the big tree'
+                        }
+                    },
+                    status: 'pending'
+                },
+                {
+                    orderId: 2,
+                    productName: 'Jasmine Rice',
+                    size: '10kg',
+                    price: '₱1100.00',
+                    mop: 'E-Wallet',
+                    customerDetails: {
+                        lastName: 'Cruz',
+                        firstName: 'Jose',
+                        gender: 'male',
+                        contact: '09987654321',
+                        email: 'jose.cruz@example.com',
+                        shippingAddress: {
+                            city: 'Mandaue City',
+                            province: 'Cebu',
+                            street: '456 Subd',
+                            barangay: 'Banilad',
+                            postalCode: '6014',
+                            additionalMessage: 'Gate with blue paint'
+                        }
+                    },
+                    status: 'pending'
+                },
+                // Add more pending order data here
+            ];
+
+            const pendingOrdersTableBody = document.getElementById('pending-orders-table-body');
+            const pendingOrdersEmptyMessage = document.getElementById('pending-orders-empty');
+
+            // Clear the table body
+            pendingOrdersTableBody.innerHTML = '';
+
+            const pendingOrders = currentOrders.filter(order => order.status === 'pending');
+
+            if (pendingOrders.length > 0) {
+                pendingOrdersEmptyMessage.style.display = 'none';
+                pendingOrdersTableBody.style.display = 'table-row-group'; // Ensure table body is displayed
+                pendingOrders.forEach(order => {
+                    const row = pendingOrdersTableBody.insertRow();
+                    const orderNoCell = row.insertCell();
+                    const productNameCell = row.insertCell();
+                    const sizeCell = row.insertCell();
+                    const priceCell = row.insertCell();
+                    const mopCell = row.insertCell();
+                    const customerDetailsCell = row.insertCell();
+                    const confirmationCell = row.insertCell();
+
+                    orderNoCell.textContent = order.orderId;
+                    productNameCell.textContent = order.productName;
+                    sizeCell.textContent = order.size;
+                    priceCell.textContent = order.price;
+
+                    // Create the MOP select dropdown
+                    const mopSelect = document.createElement('select');
+                    mopSelect.id = `mop-${order.orderId}`;
+                    const codOption = document.createElement('option');
+                    codOption.value = 'Cash on Delivery';
+                    codOption.textContent = 'Cash on Delivery';
+                    const cardOption = document.createElement('option');
+                    cardOption.value = 'Credit Card';
+                    cardOption.textContent = 'Credit Card';
+                    const eWalletOption = document.createElement('option');
+                    eWalletOption.value = 'E-wallet';
+                    eWalletOption.textContent = 'E-wallet';
+
+                    // Set the initially selected value
+                    if (order.mop === 'Cash on Delivery') codOption.selected = true;
+                    else if (order.mop === 'Credit Card') cardOption.selected = true;
+                    else if (order.mop === 'E-wallet') eWalletOption.selected = true;
+
+                    mopSelect.appendChild(codOption);
+                    mopSelect.appendChild(cardOption);
+                    mopSelect.appendChild(eWalletOption);
+                    mopCell.appendChild(mopSelect);
+
+                    const detailsButton = document.createElement('button');
+                    detailsButton.textContent = 'Edit Details';
+                    detailsButton.onclick = function() { showCustomerDetails(order.orderId); };
+                    customerDetailsCell.appendChild(detailsButton);
+
+                    const confirmButton = document.createElement('button');
+                    confirmButton.textContent = 'Confirm';
+                    confirmButton.onclick = function() { confirmOrder(order.orderId); };
+
+                    const separator = document.createElement('span'); // Create a span for the separator
+                    separator.textContent = ' / ';
+                    separator.classList.add('button-separator'); // Add a class for potential styling
+
+                    const cancelButton = document.createElement('button');
+                    cancelButton.textContent = 'Cancel';
+                    cancelButton.onclick = function() { cancelOrder(order.orderId); };
+
+                    confirmationCell.appendChild(confirmButton);
+                    confirmationCell.appendChild(separator); // Append the separator span
+                    confirmationCell.appendChild(cancelButton);
+                });
+            } else {
+                pendingOrdersEmptyMessage.style.display = 'block';
+                pendingOrdersTableBody.style.display = 'none'; // Hide the table if no pending orders
+            }
+
+            document.getElementById('pending-count').textContent = pendingOrders.length;
+            // You would do similar filtering and counting for the other order statuses
+            document.getElementById('out-for-delivery-count').textContent = currentOrders.filter(order => order.status === 'out-for-delivery').length;
+            document.getElementById('completed-count').textContent = currentOrders.filter(order => order.status === 'completed').length;
+            document.getElementById('cancelled-returned-count').textContent = currentOrders.filter(order => order.status === 'cancelled' || order.status === 'returned').length;
+
+            // Initially show the pending orders list
+            showOrderList('pending');
+        });    
+        
+    </script>
+</body>
+</html>

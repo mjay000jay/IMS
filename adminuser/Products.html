@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Products - Bugasan ni Mayang</title>
+    <link rel="stylesheet" href="Products.css"> </head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Bugasan ni<br>Mayang</h2>
+            <nav>
+                <p class = "extension">MAIN</p>
+                <ul>
+                    <li><a href="Dashboard.html">Dashboard</a></li>
+                    <li><a href="UserManagement.html">User Management</a></li>
+                    <li class="active">Products</li> 
+                    <li><a href="">Stock Management</a></li>
+                    <li><a href="supplier.html">Suppliers</a></li>
+                    <li><a href="">Reports</a></li>
+                </ul>
+            </nav>
+            <div class="settings">
+                <p class = "extension">SETTINGS</p>
+                <ul>
+                    <li><a href="">Settings</a></li>
+                    <li><a href="">Logout</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <div class="user-profile">
+                    <div class="avatar">A</div>
+                    <span>Admin User</span>
+                </div>
+            </header>
+
+            <section class="products-management">
+                <div class="header">
+                    <h1>Products</h1>
+                    <p>Manage your product catalog</p>
+                    <button class="add-product-btn">+ Add New Product</button>
+                </div>
+
+                <div class="search-filter">
+                    <input type="text" placeholder="Search products...">
+                    <select>
+                        <option>All Categories</option>
+                    </select>
+                    <select>
+                        <option>All Status</option>
+                    </select>
+                </div>
+
+                <table id="products-table">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Product Name</th>
+                            <th>Type</th>
+                            <th>Sizes</th>
+                            <th>Price Range</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Sinandomeng</td>
+                            <td>White Rice</td>
+                            <td>1kg, 5kg, 10kg</td>
+                            <td>₱50.00- ₱1300.00</td>
+                            <td>In Stock</td>
+                            <td><a href="#" ></a> <a href="#" class="edit-btn">Edit</a> <a href="#" class="delete-btn">Delete</a></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Jasmine Rice</td>
+                            <td>Specialty Rice</td>
+                            <td>1kg, 5kg, 10kg</td>
+                            <td>₱60.00- ₱1500.00</td>
+                            <td>Low Stock</td>
+                            <td><a href="#"></a> <a href="#" class="edit-btn">Edit</a> <a href="#" class="delete-btn">Delete</a></td>
+                        </tr>
+                        </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <div id="add-product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Add New Product</h2>
+            <form id="add-product-form">
+                <div>
+                    <label for="product-name">Product Name:</label>
+                    <input type="text" id="product-name" name="product-name" required>
+                </div>
+                <div>
+                    <label for="product-category">Category:</label>
+                    <select id="product-category" name="product-category">
+                        <option value="White Rice">White Rice</option>
+                        <option value="Brown Rice">Brown Rice</option>
+                        <option value="Specialty Rice">Specialty Rice</option>
+                        <option value="Others...">Other</option>
+                        </select>
+                </div>
+                <div>
+                    <label for="product-sizes">Sizes (e.g., 1kg, 5kg, 10kg):</label>
+                    <input type="text" id="product-sizes" name="product-sizes" placeholder="Separate sizes with commas">
+                </div>
+                <div>
+                    <label for="product-price-min">Price Range (Min):</label>
+                    <input type="number" id="product-price-min" name="product-price-min" step="0.01">
+                </div>
+                <div>
+                    <label for="product-price-max">Price Range (Max):</label>
+                    <input type="number" id="product-price-max" name="product-price-max" step="0.01">
+                </div>
+                <div>
+                    <label for="product-status">Status:</label>
+                    <select id="product-status" name="product-status">
+                        <option value="In Stock">In Stock</option>
+                        <option value="Low Stock">Low Stock</option>
+                        <option value="Out of Stock">Out of Stock</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit">Add Product</button>
+                    <button type="button" id="cancel-add-product">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script >
+            document.addEventListener('DOMContentLoaded', () => {
+            const addProductBtn = document.querySelector('.add-product-btn');
+            const addProductModal = document.getElementById('add-product-modal');
+            const closeButton = document.querySelector('.close-button');
+            const addProductForm = document.getElementById('add-product-form');
+            const productsTableBody = document.querySelector('#products-table tbody');
+            const cancelButton = document.getElementById('cancel-add-product');
+
+            const searchInput = document.querySelector('.search-filter input[type="text"]');
+            const categorySelect = document.querySelector('.search-filter select:nth-child(2)');
+            const statusSelect = document.querySelector('.search-filter select:nth-child(3)');
+
+            let productsData = [];
+            let editingProductId = null; // To track which product is being edited
+
+            // Function to fetch product data (replace with your actual data source)
+            const fetchProducts = () => {
+                productsData = Array.from(productsTableBody.rows).map(row => {
+                    const cells = Array.from(row.cells);
+                    return {
+                        id: cells[0].textContent,
+                        name: cells[1].textContent,
+                        category: cells[2].textContent,
+                        sizes: cells[3].textContent,
+                        priceRange: cells[4].textContent,
+                        status: cells[5].textContent,
+                        rowElement: row
+                    };
+                });
+            };
+
+            const filterProducts = () => {
+                const searchTerm = searchInput.value.toLowerCase();
+                const selectedCategory = categorySelect.value;
+                const selectedStatus = statusSelect.value;
+
+                productsTableBody.innerHTML = '';
+
+                const filteredProducts = productsData.filter(product => {
+                    const nameMatch = product.name.toLowerCase().includes(searchTerm);
+                    const categoryMatch = selectedCategory === 'All Categories' || product.category === selectedCategory;
+                    const statusMatch = selectedStatus === 'All Status' || product.status === selectedStatus;
+
+                    return nameMatch && categoryMatch && statusMatch;
+                });
+
+                filteredProducts.forEach(product => {
+                    productsTableBody.appendChild(product.rowElement);
+                });
+
+                // Re-number the IDs in the displayed table after filtering
+                Array.from(productsTableBody.rows).forEach((row, index) => {
+                    row.cells[0].textContent = index + 1;
+                });
+            };
+
+            fetchProducts();
+
+            searchInput.addEventListener('input', filterProducts);
+            categorySelect.addEventListener('change', filterProducts);
+            statusSelect.addEventListener('change', filterProducts);
+
+            const openAddProductModal = () => {
+                addProductModal.style.display = 'block';
+                editingProductId = null; // Reset editing ID when opening for adding
+                document.querySelector('#add-product-modal h2').textContent = 'Add New Product';
+                document.querySelector('#add-product-form button[type="submit"]').textContent = 'Add Product';
+                addProductForm.reset();
+            };
+
+            addProductBtn.addEventListener('click', openAddProductModal);
+
+            const closeModal = () => {
+                addProductModal.style.display = 'none';
+                addProductForm.reset();
+                editingProductId = null;
+            };
+
+            closeButton.addEventListener('click', closeModal);
+
+            window.addEventListener('click', (event) => {
+                if (event.target === addProductModal) {
+                    closeModal();
+                }
+            });
+
+            cancelButton.addEventListener('click', () => {
+                if (confirm('Do you want to cancel?')) {
+                    closeModal();
+                }
+            });
+
+            // Function to populate the modal with product details for editing
+            const populateEditModal = (product) => {
+                document.querySelector('#add-product-modal h2').textContent = 'Edit Product';
+                document.querySelector('#add-product-form button[type="submit"]').textContent = 'Save Changes';
+                document.getElementById('product-name').value = product.name;
+                document.getElementById('product-category').value = product.category;
+                document.getElementById('product-sizes').value = product.sizes;
+                const priceParts = product.priceRange.replace('₱', '').split(' - ');
+                document.getElementById('product-price-min').value = parseFloat(priceParts[0]).toFixed(2);
+                document.getElementById('product-price-max').value = parseFloat(priceParts[1]).toFixed(2);
+                document.getElementById('product-status').value = product.status;
+                addProductModal.style.display = 'block';
+            };
+
+            addProductForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+
+                const productName = document.getElementById('product-name').value.trim();
+                const productCategory = document.getElementById('product-category').value;
+                const productSizes = document.getElementById('product-sizes').value.trim();
+                const productPriceMin = document.getElementById('product-price-min').value.trim();
+                const productPriceMax = document.getElementById('product-price-max').value.trim();
+                const productStatus = document.getElementById('product-status').value;
+
+                if (productName) {
+                    if (editingProductId !== null) {
+                        // Update existing product
+                        const productIndex = productsData.findIndex(p => p.id === editingProductId);
+                        if (productIndex > -1) {
+                            productsData[productIndex].name = productName;
+                            productsData[productIndex].category = productCategory;
+                            productsData[productIndex].sizes = productSizes;
+                            productsData[productIndex].priceRange = `₱${parseFloat(productPriceMin).toFixed(2)} - ₱${parseFloat(productPriceMax).toFixed(2)}`;
+                            productsData[productIndex].status = productStatus;
+
+                            const rowToUpdate = productsData[productIndex].rowElement;
+                            const cells = rowToUpdate.cells;
+                            cells[1].textContent = productName;
+                            cells[2].textContent = productCategory;
+                            cells[3].textContent = productSizes;
+                            cells[4].textContent = `₱${parseFloat(productPriceMin).toFixed(2)} - ₱${parseFloat(productPriceMax).toFixed(2)}`;
+                            cells[5].textContent = productStatus;
+                            cells[5].className = productStatus.toLowerCase().replace(' ', '-'); // Update status class
+                        }
+                    } else {
+                        // Add new product
+                        const newProductId = productsData.length + 1;
+                        const newRow = productsTableBody.insertRow();
+                        newRow.insertCell().textContent = newProductId;
+                        newRow.insertCell().textContent = productName;
+                        newRow.insertCell().textContent = productCategory;
+                        newRow.insertCell().textContent = productSizes;
+                        newRow.insertCell().textContent = `₱${parseFloat(productPriceMin).toFixed(2)} - ₱${parseFloat(productPriceMax).toFixed(2)}`;
+                        newRow.insertCell().textContent = productStatus;
+                        const actionsCell = newRow.insertCell();
+                        actionsCell.innerHTML = '<a href="#">View</a> <a href="#" class="edit-btn">Edit</a> <a href="#" class="delete-btn">Delete</a>';
+                        
+
+                        productsData.push({
+                            id: newProductId,
+                            name: productName,
+                            category: productCategory,
+                            sizes: productSizes,
+                            priceRange: `₱${parseFloat(productPriceMin).toFixed(2)} - ₱${parseFloat(productPriceMax).toFixed(2)}`,
+                            status: productStatus,
+                            rowElement: newRow
+                        });
+                    }
+
+                    closeModal();
+                    filterProducts(); // Re-apply filters
+                } else {
+                    alert('Product Name is required.');
+                }
+            });
+
+            productsTableBody.addEventListener('click', (event) => {
+                if (event.target.classList.contains('delete-btn')) {
+                    if (confirm('Are you sure you want to delete this product?')) {
+                        const rowToDelete = event.target.closest('tr');
+                        const productIdToDelete = rowToDelete.cells[0].textContent;
+                        productsData = productsData.filter(product => product.id !== productIdToDelete);
+                        rowToDelete.remove();
+                        filterProducts(); // Re-apply filters to re-number IDs
+                        // You would typically send a delete request to your server here.
+                    }
+                } else if (event.target.classList.contains('edit-btn')) {
+                    const rowToEdit = event.target.closest('tr');
+                    const productIdToEdit = rowToEdit.cells[0].textContent;
+                    const productToEdit = productsData.find(product => product.id === productIdToEdit);
+                    if (productToEdit) {
+                        editingProductId = productIdToEdit;
+                        populateEditModal(productToEdit);
+                    }
+                } else if (event.target.tagName === 'A' && event.target.textContent === 'View') {
+                    const rowToView = event.target.closest('tr');
+                    const productName = rowToView.cells[1].textContent;
+                    alert(`Viewing details for: ${productName}`);
+                    // Implement your view functionality here (e.g., show a detailed modal)
+                }
+            });
+
+            // Populate category and status dropdowns on initial load
+            const populateDropdowns = () => {
+                const categories = ['All Categories', ...Array.from(new Set(productsData.map(p => p.category)))];
+                categorySelect.innerHTML = '';
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category;
+                    categorySelect.appendChild(option);
+                });
+
+                const statuses = ['All Status', ...Array.from(new Set(productsData.map(p => p.status)))];
+                statusSelect.innerHTML = '';
+                statuses.forEach(status => {
+                    const option = document.createElement('option');
+                    option.value = status;
+                    option.textContent = status;
+                    statusSelect.appendChild(option);
+                });
+            };
+
+            populateDropdowns();
+            filterProducts(); // Initial filtering to apply "All" selections
+        });
+    </script>
+</body>
+</html>
