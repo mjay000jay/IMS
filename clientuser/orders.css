@@ -237,9 +237,10 @@ header h1 {
         }
 
         .pending-orders-table th, .pending-orders-table td {
+            font-size: 15px;
             border: 1px solid #ddd;
             padding: 8px;
-            text-align: left;
+            text-align: center;
         }
 
         .pending-orders-table th {

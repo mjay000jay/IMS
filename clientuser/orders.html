@@ -5,7 +5,6 @@
     <title>Orders - Bugas ni Mayang</title>
     <link rel="stylesheet" href="Orders.css">
 </head>
-</head>
 <body>
     <div class="container">
         <aside class="sidebar">
@@ -65,9 +64,9 @@
                                 <th>Product Name</th>
                                 <th>Size</th>
                                 <th>Price</th>
-                                <th>MOP</th>
+                                <th>Shipping Fee</th> <th>MOP</th>
                                 <th>Shipping Address</th>
-                                <th>Confirmation</th>
+                                <th>Total Cost</th> <th>Confirmation</th>
                             </tr>
                         </thead>
                         <tbody id="pending-orders-table-body">
@@ -83,11 +82,9 @@
                                 <th>Order No.</th>
                                 <th>Product Name</th>
                                 <th>Size</th>
-                                <th>Price</th>
-                                <th>MOP</th>
                                 <th>Date Ordered</th>
                                 <th>Est. Time of Arrival</th>
-                                <th>Confirmation</th>
+                                <th>Total Cost</th> <th>Confirmation</th>
                             </tr> 
                         </thead>
                         <tbody id="out-for-delivery-orders-table-body">
@@ -99,18 +96,17 @@
                 <div id="completed-orders-list" class="order-list">
                     <h2>Completed Orders</h2>
                     <table class="completed-orders-table">
-                      <thead>
+                    <thead>
                         <tr>
-                          <th>Order No.</th>
-                          <th>Product Name</th>
-                          <th>Size</th>
-                          <th>Price</th>
-                          <th>MOP</th>
-                          <th>Date Ordered</th>
-                          <th>Date Delivered</th>
-                        </tr>
-                      </thead>
-                      <tbody id="completed-orders-table-body">
+                            <th>Order No.</th>
+                            <th>Product Name</th>
+                            <th>Size</th>
+                            <th>MOP</th>
+                            <th>Date Ordered</th>
+                            <th>Date Delivered</th>
+                            <th>Total Cost</th> </tr>
+                    </thead>
+                    <tbody id="completed-orders-table-body">
                         </tbody>
                     </table>
                     <p>No completed orders at the moment.</p>
@@ -119,19 +115,19 @@
                 <div id="cancelled-returned-orders-list" class="order-list">
                     <h2>Cancelled/Returned Orders</h2>
                     <table class="cancelled-returned-orders-table">
-                      <thead>
+                    <thead>
                         <tr>
-                          <th>Order No.</th>
-                          <th>Product Name</th>
-                          <th>Size</th>
-                          <th>Price</th>
-                          <th>MOP</th>
-                          <th>Date Ordered</th>
-                          <th>Date Cancelled/Returned</th>
-                          <th>Reason</th>
-                          <th>Status</th> </tr>
-                      </thead>
-                      <tbody id="cancelled-returned-orders-table-body">
+                            <th>Order No.</th>
+                            <th>Product Name</th>
+                            <th>Size</th>
+                            <th>Price</th>
+                            <th>Shipping Fee</th> <th>MOP</th>
+                            <th>Date Ordered</th>
+                            <th>Date Cancelled/Returned</th>
+                            <th>Total Cost</th> <th>Reason</th>
+                            <th>Status</th> </tr>
+                    </thead>
+                    <tbody id="cancelled-returned-orders-table-body">
                         </tbody>
                     </table>
                     <p>No cancelled/returned orders at the moment.</p>
@@ -204,6 +200,12 @@
                     <textarea id="shipping-additional-message-edit" name="shipping-additional-message-edit"></textarea>
                 </div>
 
+                <div class="modal-section-title">Order Details</div>
+                <div>
+                    <label for="shipping-fee-edit">Shipping Fee:</label>
+                    <input type="number" id="shipping-fee-edit" name="shipping-fee-edit" step="0.01" min="0">
+                </div>
+
                 <div class="modal-actions">
                     <button type="button" class="save" onclick="saveCustomerDetails()">Save Details</button>
                     <button type="button" class="cancel" onclick="closeModal()">Cancel</button>
@@ -214,8 +216,12 @@
     </div>
 
     <script>
-      let currentOrders = []; // To store the fetched order data
+        let currentOrders = []; // To store the fetched order data
         let activeOrderIdForDetails = null; // To track which order's details are being viewed
+
+        function formatCurrency(amount) {
+            return `₱${parseFloat(amount).toFixed(2)}`;
+        }
 
         function showCustomerDetails(orderId) {
             activeOrderIdForDetails = orderId;
@@ -232,6 +238,7 @@
                 document.getElementById('shipping-barangay-edit').value = order.customerDetails.shippingAddress.barangay || '';
                 document.getElementById('shipping-postal-code-edit').value = order.customerDetails.shippingAddress.postalCode || '';
                 document.getElementById('shipping-additional-message-edit').value = order.customerDetails.shippingAddress.additionalMessage || '';
+                document.getElementById('shipping-fee-edit').value = order.shippingFee || 0; // Populate shipping fee
                 document.getElementById('current-order-id').value = orderId;
                 document.getElementById('customerDetailsModal').style.display = "block";
             }
@@ -240,7 +247,13 @@
         function saveCustomerDetails() {
             if (activeOrderIdForDetails) {
                 const order = currentOrders.find(order => order.orderId === activeOrderIdForDetails);
-                if (order && order.customerDetails) {
+                if (order) { // Check if order and customerDetails exist
+                    if (!order.customerDetails) {
+                        order.customerDetails = { shippingAddress: {} };
+                    } else if (!order.customerDetails.shippingAddress) {
+                        order.customerDetails.shippingAddress = {};
+                    }
+
                     order.customerDetails.lastName = document.getElementById('customer-lastname-edit').value;
                     order.customerDetails.firstName = document.getElementById('customer-firstname-edit').value;
                     order.customerDetails.gender = document.getElementById('customer-gender-edit').value;
@@ -252,11 +265,18 @@
                     order.customerDetails.shippingAddress.barangay = document.getElementById('shipping-barangay-edit').value;
                     order.customerDetails.shippingAddress.postalCode = document.getElementById('shipping-postal-code-edit').value;
                     order.customerDetails.shippingAddress.additionalMessage = document.getElementById('shipping-additional-message-edit').value;
+                    order.shippingFee = parseFloat(document.getElementById('shipping-fee-edit').value) || 0; // Save shipping fee
+
+                    // Recalculate total cost
+                    const productPrice = parseFloat(order.price.replace('₱', '').replace(',', ''));
+                    order.totalCost = productPrice + order.shippingFee;
+
 
                     // In a real application, you would send this updated information
                     // to your backend to persist the changes.
-                    alert(`Customer details for Order ${activeOrderIdForDetails} saved! (Backend update needed)`);
+                    alert(`Customer details and shipping fee for Order ${activeOrderIdForDetails} saved! (Backend update needed)`);
                     closeModal();
+                    renderOrders(); // Re-render the table to reflect changes
                 }
             }
         }
@@ -283,13 +303,20 @@
                 // In a real application, you would send an update to your backend
                 // to change the order status and the MOP, and potentially remove it
                 // from the pending list.
+                // For demonstration, let's just change its status and re-render
+                order.status = 'out-for-delivery'; // Example: move to out-for-delivery
+                renderOrders();
             }
         }
 
         function cancelOrder(orderId) {
-            alert(`Order ${orderId} cancelled! (Implementation to update backend needed)`);
-            // In a real application, you would send an update to your backend
-            // to change the order status and potentially move it to the cancelled list.
+            const order = currentOrders.find(order => order.orderId === orderId);
+            if (order) {
+                alert(`Order ${orderId} cancelled! (Implementation to update backend needed)`);
+                // For demonstration, let's just change its status and re-render
+                order.status = 'cancelled';
+                renderOrders();
+            }
         }
 
         function showOrderList(listId) {
@@ -304,16 +331,163 @@
             }
         }
 
-        // In a real application, you would fetch your order data
-        // and update the counts and lists dynamically.
+        function renderOrders() {
+            const pendingOrdersTableBody = document.getElementById('pending-orders-table-body');
+            const pendingOrdersEmptyMessage = document.getElementById('pending-orders-empty');
+
+            // Clear the table bodies
+            pendingOrdersTableBody.innerHTML = '';
+            document.getElementById('out-for-delivery-orders-table-body').innerHTML = '';
+            document.getElementById('completed-orders-table-body').innerHTML = '';
+            document.getElementById('cancelled-returned-orders-table-body').innerHTML = '';
+
+            const pendingOrders = currentOrders.filter(order => order.status === 'pending');
+            const outForDeliveryOrders = currentOrders.filter(order => order.status === 'out-for-delivery');
+            const completedOrders = currentOrders.filter(order => order.status === 'completed');
+            const cancelledReturnedOrders = currentOrders.filter(order => order.status === 'cancelled' || order.status === 'returned');
+
+
+            // Render Pending Orders
+            if (pendingOrders.length > 0) {
+                pendingOrdersEmptyMessage.style.display = 'none';
+                pendingOrdersTableBody.style.display = 'table-row-group';
+                pendingOrders.forEach(order => {
+                    const row = pendingOrdersTableBody.insertRow();
+                    row.insertCell().textContent = order.orderId;
+                    row.insertCell().textContent = order.productName;
+                    row.insertCell().textContent = order.size;
+                    row.insertCell().textContent = order.price;
+                    row.insertCell().textContent = formatCurrency(order.shippingFee); // Shipping Fee
+                    
+                    // MOP dropdown
+                    const mopCell = row.insertCell();
+                    const mopSelect = document.createElement('select');
+                    mopSelect.id = `mop-${order.orderId}`;
+                    ['Cash on Delivery', 'Credit Card', 'E-wallet'].forEach(optionText => {
+                        const option = document.createElement('option');
+                        option.value = optionText;
+                        option.textContent = optionText;
+                        if (order.mop === optionText) option.selected = true;
+                        mopSelect.appendChild(option);
+                    });
+                    mopCell.appendChild(mopSelect);
+
+                    const customerDetailsCell = row.insertCell();
+                    const detailsButton = document.createElement('button');
+                    detailsButton.textContent = 'Edit Details';
+                    detailsButton.onclick = function() { showCustomerDetails(order.orderId); };
+                    customerDetailsCell.appendChild(detailsButton);
+
+                    row.insertCell().textContent = formatCurrency(order.totalCost); // Total Cost
+
+                    const confirmationCell = row.insertCell();
+                    const confirmButton = document.createElement('button');
+                    confirmButton.textContent = 'Confirm';
+                    confirmButton.onclick = function() { confirmOrder(order.orderId); };
+                    const separator = document.createElement('span');
+                    separator.textContent = ' / ';
+                    separator.classList.add('button-separator');
+                    const cancelButton = document.createElement('button');
+                    cancelButton.textContent = 'Cancel';
+                    cancelButton.onclick = function() { cancelOrder(order.orderId); };
+                    confirmationCell.appendChild(confirmButton);
+                    confirmationCell.appendChild(separator);
+                    confirmationCell.appendChild(cancelButton);
+                });
+            } else {
+                pendingOrdersEmptyMessage.style.display = 'block';
+                pendingOrdersTableBody.style.display = 'none';
+            }
+
+            // Render Out for Delivery Orders
+            const outForDeliveryTableBody = document.getElementById('out-for-delivery-orders-table-body');
+            const outForDeliveryEmptyMessage = document.querySelector('#out-for-delivery-orders-list p');
+            if (outForDeliveryOrders.length > 0) {
+                outForDeliveryEmptyMessage.style.display = 'none';
+                outForDeliveryTableBody.style.display = 'table-row-group';
+                outForDeliveryOrders.forEach(order => {
+                    const row = outForDeliveryTableBody.insertRow();
+                    row.insertCell().textContent = order.orderId;
+                    row.insertCell().textContent = order.productName;
+                    row.insertCell().textContent = order.size;
+                    row.insertCell().textContent = order.price;
+                    row.insertCell().textContent = formatCurrency(order.shippingFee); // Shipping Fee
+                    row.insertCell().textContent = order.mop;
+                    row.insertCell().textContent = order.dateOrdered || 'N/A'; // Assuming you'll add dateOrdered
+                    row.insertCell().textContent = order.eta || 'N/A'; // Assuming you'll add ETA
+                    row.insertCell().textContent = formatCurrency(order.totalCost); // Total Cost
+                    row.insertCell().textContent = 'Pending Delivery'; // Or relevant confirmation status
+                });
+            } else {
+                outForDeliveryEmptyMessage.style.display = 'block';
+                outForDeliveryTableBody.style.display = 'none';
+            }
+
+            // Render Completed Orders
+            const completedOrdersTableBody = document.getElementById('completed-orders-table-body');
+            const completedOrdersEmptyMessage = document.querySelector('#completed-orders-list p');
+            if (completedOrders.length > 0) {
+                completedOrdersEmptyMessage.style.display = 'none';
+                completedOrdersTableBody.style.display = 'table-row-group';
+                completedOrders.forEach(order => {
+                    const row = completedOrdersTableBody.insertRow();
+                    row.insertCell().textContent = order.orderId;
+                    row.insertCell().textContent = order.productName;
+                    row.insertCell().textContent = order.size;
+                    row.insertCell().textContent = order.price;
+                    row.insertCell().textContent = formatCurrency(order.shippingFee); // Shipping Fee
+                    row.insertCell().textContent = order.mop;
+                    row.insertCell().textContent = order.dateOrdered || 'N/A';
+                    row.insertCell().textContent = order.dateDelivered || 'N/A'; // Assuming you'll add dateDelivered
+                    row.insertCell().textContent = formatCurrency(order.totalCost); // Total Cost
+                });
+            } else {
+                completedOrdersEmptyMessage.style.display = 'block';
+                completedOrdersTableBody.style.display = 'none';
+            }
+
+            // Render Cancelled/Returned Orders
+            const cancelledReturnedOrdersTableBody = document.getElementById('cancelled-returned-orders-table-body');
+            const cancelledReturnedOrdersEmptyMessage = document.querySelector('#cancelled-returned-orders-list p');
+            if (cancelledReturnedOrders.length > 0) {
+                cancelledReturnedOrdersEmptyMessage.style.display = 'none';
+                cancelledReturnedOrdersTableBody.style.display = 'table-row-group';
+                cancelledReturnedOrders.forEach(order => {
+                    const row = cancelledReturnedOrdersTableBody.insertRow();
+                    row.insertCell().textContent = order.orderId;
+                    row.insertCell().textContent = order.productName;
+                    row.insertCell().textContent = order.size;
+                    row.insertCell().textContent = order.price;
+                    row.insertCell().textContent = formatCurrency(order.shippingFee); // Shipping Fee
+                    row.insertCell().textContent = order.mop;
+                    row.insertCell().textContent = order.dateOrdered || 'N/A';
+                    row.insertCell().textContent = order.dateCancelledReturned || 'N/A'; // Assuming you'll add dateCancelledReturned
+                    row.insertCell().textContent = formatCurrency(order.totalCost); // Total Cost
+                    row.insertCell().textContent = order.reason || 'N/A'; // Assuming you'll add reason
+                    row.insertCell().textContent = order.status;
+                });
+            } else {
+                cancelledReturnedOrdersEmptyMessage.style.display = 'block';
+                cancelledReturnedOrdersTableBody.style.display = 'none';
+            }
+
+            document.getElementById('pending-count').textContent = pendingOrders.length;
+            document.getElementById('out-for-delivery-count').textContent = outForDeliveryOrders.length;
+            document.getElementById('completed-count').textContent = completedOrders.length;
+            document.getElementById('cancelled-returned-count').textContent = cancelledReturnedOrders.length;
+
+            showOrderList('pending'); // Ensure the pending list is shown by default
+        }
+
+
         document.addEventListener('DOMContentLoaded', () => {
-            // Example data (replace with your actual data fetching)
             currentOrders = [
                 {
                     orderId: 1,
                     productName: 'Sinandomeng',
                     size: '5kg',
-                    price: '₱650.00',
+                    price: '₱650.00', // This should ideally be a number for calculation
+                    shippingFee: 50.00, // Added shipping fee
                     mop: 'Cash on Delivery',
                     customerDetails: {
                         lastName: 'Santos',
@@ -336,7 +510,8 @@
                     orderId: 2,
                     productName: 'Jasmine Rice',
                     size: '10kg',
-                    price: '₱1100.00',
+                    price: '₱1100.00', // This should ideally be a number for calculation
+                    shippingFee: 75.00, // Added shipping fee
                     mop: 'E-Wallet',
                     customerDetails: {
                         lastName: 'Cruz',
@@ -355,93 +530,16 @@
                     },
                     status: 'pending'
                 },
-                // Add more pending order data here
             ];
 
-            const pendingOrdersTableBody = document.getElementById('pending-orders-table-body');
-            const pendingOrdersEmptyMessage = document.getElementById('pending-orders-empty');
-
-            // Clear the table body
-            pendingOrdersTableBody.innerHTML = '';
-
-            const pendingOrders = currentOrders.filter(order => order.status === 'pending');
-
-            if (pendingOrders.length > 0) {
-                pendingOrdersEmptyMessage.style.display = 'none';
-                pendingOrdersTableBody.style.display = 'table-row-group'; // Ensure table body is displayed
-                pendingOrders.forEach(order => {
-                    const row = pendingOrdersTableBody.insertRow();
-                    const orderNoCell = row.insertCell();
-                    const productNameCell = row.insertCell();
-                    const sizeCell = row.insertCell();
-                    const priceCell = row.insertCell();
-                    const mopCell = row.insertCell();
-                    const customerDetailsCell = row.insertCell();
-                    const confirmationCell = row.insertCell();
-
-                    orderNoCell.textContent = order.orderId;
-                    productNameCell.textContent = order.productName;
-                    sizeCell.textContent = order.size;
-                    priceCell.textContent = order.price;
-
-                    // Create the MOP select dropdown
-                    const mopSelect = document.createElement('select');
-                    mopSelect.id = `mop-${order.orderId}`;
-                    const codOption = document.createElement('option');
-                    codOption.value = 'Cash on Delivery';
-                    codOption.textContent = 'Cash on Delivery';
-                    const cardOption = document.createElement('option');
-                    cardOption.value = 'Credit Card';
-                    cardOption.textContent = 'Credit Card';
-                    const eWalletOption = document.createElement('option');
-                    eWalletOption.value = 'E-wallet';
-                    eWalletOption.textContent = 'E-wallet';
-
-                    // Set the initially selected value
-                    if (order.mop === 'Cash on Delivery') codOption.selected = true;
-                    else if (order.mop === 'Credit Card') cardOption.selected = true;
-                    else if (order.mop === 'E-wallet') eWalletOption.selected = true;
-
-                    mopSelect.appendChild(codOption);
-                    mopSelect.appendChild(cardOption);
-                    mopSelect.appendChild(eWalletOption);
-                    mopCell.appendChild(mopSelect);
-
-                    const detailsButton = document.createElement('button');
-                    detailsButton.textContent = 'Edit Details';
-                    detailsButton.onclick = function() { showCustomerDetails(order.orderId); };
-                    customerDetailsCell.appendChild(detailsButton);
-
-                    const confirmButton = document.createElement('button');
-                    confirmButton.textContent = 'Confirm';
-                    confirmButton.onclick = function() { confirmOrder(order.orderId); };
-
-                    const separator = document.createElement('span'); // Create a span for the separator
-                    separator.textContent = ' / ';
-                    separator.classList.add('button-separator'); // Add a class for potential styling
-
-                    const cancelButton = document.createElement('button');
-                    cancelButton.textContent = 'Cancel';
-                    cancelButton.onclick = function() { cancelOrder(order.orderId); };
-
-                    confirmationCell.appendChild(confirmButton);
-                    confirmationCell.appendChild(separator); // Append the separator span
-                    confirmationCell.appendChild(cancelButton);
-                });
-            } else {
-                pendingOrdersEmptyMessage.style.display = 'block';
-                pendingOrdersTableBody.style.display = 'none'; // Hide the table if no pending orders
-            }
-
-            document.getElementById('pending-count').textContent = pendingOrders.length;
-            // You would do similar filtering and counting for the other order statuses
-            document.getElementById('out-for-delivery-count').textContent = currentOrders.filter(order => order.status === 'out-for-delivery').length;
-            document.getElementById('completed-count').textContent = currentOrders.filter(order => order.status === 'completed').length;
-            document.getElementById('cancelled-returned-count').textContent = currentOrders.filter(order => order.status === 'cancelled' || order.status === 'returned').length;
-
-            // Initially show the pending orders list
-            showOrderList('pending');
-        });    
+            // Calculate initial total costs
+            currentOrders.forEach(order => {
+                const productPrice = parseFloat(order.price.replace('₱', '').replace(',', ''));
+                order.totalCost = productPrice + order.shippingFee;
+            });
+            
+            renderOrders(); // Initial render of all order lists
+        });    
         
     </script>
 </body>
